@@ -2,9 +2,9 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ master ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ master ]
 
 jobs:
 
@@ -20,7 +20,7 @@ jobs:
         DOCKER_PASS: ${{secrets.DOCKERHUB_PASS}}
       run: |
         docker login -u $DOCKER_USER -p $DOCKER_PASS
-    - name: Build the docker image
+    - name: Build the Docker image
       run: docker build . --file Dockerfile --tag sa393nt/pokeneasteis:latest
       
     - name: Docker Push
