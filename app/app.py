@@ -35,6 +35,7 @@ def create_app():
         picked_name = picked_image.split('/')[-1] if picked_image else None
         picked_name = picked_name.split('.')[0] if picked_name else None
         picked_name = picked_name.capitalize()
+        current_docker_id = get_docker_id()
 
         print(f"Picked name: {picked_name}")
 
@@ -48,10 +49,10 @@ def create_app():
         <h1>Imágenes desde S3</h1>
             <div>
                 <img src="{{ picked_image }}" style="max-width:300px;"><br>
-                <small>{{ picked_image }}</small>
+                <small>{{ current_docker_id }}</small>
                 <p><strong>Frase:</strong> {{ picked_frase }}</p>
             </div>
         """
-        return render_template_string(html, picked_image=picked_image, picked_frase=picked_frase)
+        return render_template_string(html, picked_image=picked_image, picked_frase=picked_frase, current_docker_id=current_docker_id)
 
     return app
