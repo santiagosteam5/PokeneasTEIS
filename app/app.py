@@ -1,51 +1,58 @@
 from flask import Flask, render_template_string, jsonify
-import os
 import random
-from pokeneas import pokeneas
+from .pokeneas import pokeneas
 from .utils import get_docker_id
 
-app = Flask(__name__)
+def create_app():
+    app = Flask(__name__)
+    app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
 
-s3 = boto3.client(
-    "s3",
-    aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
-    aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
-    region_name=os.getenv("AWS_REGION"),
-)
+    @app.route('/')
+    def get_pokeneas():
+        pokenea = random.choice(pokeneas)
+        return jsonify({
+            "id": pokenea["Id"],
+            "nombre": pokenea["Nombre"],
+            "altura": pokenea["Altura"],
+            "habilidad": pokenea["Habilidad"],
+            "contenedor": get_docker_id()
+        })
 
-S3_BUCKET = os.getenv("S3_BUCKET")
+    @app.route('/imagenes')
+    def mostrar_imagenes():
+        image_urls = []
+        for obj in pokeneas:
+            key = obj['Nombre'].lower().replace(" ", "_")
+            url = f"https://s3bucketwhydoesmybucketneedtohaveanuniquename.s3.us-east-1.amazonaws.com/{key}.jpg"
+            url = f"https://s3bucketwhydoesmybucketneedtohaveanuniquename.s3.us-east-1.amazonaws.com/sillemon.jpg"
+            image_urls.append(url)
 
-@app.route('/')
-def get_pokeneas():
-    pokenea = random.choice(pokenea)
-    return jsonify({
-        "id": pokenea["Id"],
-        "nombre": pokenea["Nombre"],
-        "altura": pokenea["Altura"],
-        "habilidad": pokenea["Habilidad"],
-        "contenedor": get_docker_id()
-    })
+        picked_image = random.choice(image_urls) if image_urls else None
 
-@app.route('/imagenes')
-def mostrar_imagenes():
-    objects = s3.list_objects_v2(Bucket=S3_BUCKET)
+        #prints para debug
 
-    image_urls = []
-    for obj in objects.get('Contents', []):
-        key = obj['Key']
-        url = f"https://{S3_BUCKET}.s3.amazonaws.com/{key}"
-        image_urls.append(url)
+        print(f"Picked image: {picked_image}")
 
-    picked_image = random.choice(image_urls) if image_urls else None
+        picked_name = picked_image.split('/')[-1] if picked_image else None
+        picked_name = picked_name.split('.')[0] if picked_name else None
+        picked_name = picked_name.capitalize()
 
-    html = """
-    <h1>Imágenes desde S3</h1>
-        <div>
-            <img src="{{ picked_image }}" style="max-width:300px;"><br>
-            <small>{{ picked_image }}</small>
-        </div>
-    """
-    return render_template_string(html, image_urls=image_urls)
+        print(f"Picked name: {picked_name}")
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=80)
+        picked_frase = next((p["Frase filosófica"] for p in pokeneas if p["Nombre"] == picked_name), None)
+
+        print(f"Picked frase: {picked_frase}")
+
+        #no puedo cargar las imagenes de manera local, por lo que voy a hacer el test desde aws ahora
+
+        html = """
+        <h1>Imágenes desde S3</h1>
+            <div>
+                <img src="{{ picked_image }}" style="max-width:300px;"><br>
+                <small>{{ picked_image }}</small>
+                <p><strong>Frase:</strong> {{ picked_frase }}</p>
+            </div>
+        """
+        return render_template_string(html, picked_image=picked_image, picked_frase=picked_frase)
+
+    return app

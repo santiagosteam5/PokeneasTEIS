@@ -25,7 +25,7 @@ pokeneas = [
   },
   {
     "Id": 4,
-    "Nombre": "Tamalín",
+    "Nombre": "Tamalin",
     "Altura": 0.6,
     "Habilidad": "Amarre Sabroso",
     "Imagen": "https://example.com/tamalin.png",
