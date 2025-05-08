@@ -24,7 +24,6 @@ def create_app():
         for obj in pokeneas:
             key = obj['Nombre'].lower().replace(" ", "_")
             url = f"https://s3bucketwhydoesmybucketneedtohaveanuniquename.s3.us-east-1.amazonaws.com/{key}.jpg"
-            url = f"https://s3bucketwhydoesmybucketneedtohaveanuniquename.s3.us-east-1.amazonaws.com/sillemon.jpg"
             image_urls.append(url)
 
         picked_image = random.choice(image_urls) if image_urls else None
