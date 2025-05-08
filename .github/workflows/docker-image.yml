@@ -20,9 +20,8 @@ jobs:
         DOCKER_PASS: ${{secrets.DOCKERHUB_PASS}}
       run: |
         docker login -u $DOCKER_USER -p $DOCKER_PASS
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag sa393nt/pokeneasteis:latest
-      
-    - name: Docker Push
-      run: docker push sa393nt/pokeneasteis:latest
+    - name: Build the Docker image and push
+      run: |
+        docker buildx create --use
+        docker buildx build . --file Dockerfile --tag sa393nt/pokeneasteis:latest --push --no-cache
       
