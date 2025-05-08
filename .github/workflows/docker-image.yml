@@ -21,7 +21,8 @@ jobs:
       run: |
         docker login -u $DOCKER_USER -p $DOCKER_PASS
     - name: Build the docker image
-      run: docker build . --file Dockerfile --tag sa393nt/pokeneasteis:$(date +%s)
+      run: docker build . --file Dockerfile --tag sa393nt/pokeneasteis:latest
+      
     - name: Docker Push
       run: docker push sa393nt/pokeneasteis
       
