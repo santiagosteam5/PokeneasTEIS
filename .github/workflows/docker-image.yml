@@ -24,4 +24,3 @@ jobs:
       run: |
         docker buildx create --use
         docker buildx build . --file Dockerfile --tag sa393nt/pokeneasteis:latest --push --no-cache
-      
